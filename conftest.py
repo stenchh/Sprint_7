@@ -13,7 +13,7 @@ def register():
     response = requests.post(f"{BASE_URL}/courier", json=payload)
     response.raise_for_status()
 
-    yield payload["login"], payload["password"]
+    yield payload["login"], payload["password"], payload["firstName"]
 
 
     login_data = {"login": payload["login"], "password": payload["password"]}

@@ -9,7 +9,7 @@ class TestLoginCourier:
     @allure.description('Проверяется, что курьер может успешно авторизоваться при корректных данных.')
     @allure.step('Авторизация курьера с существующими данными')
     def test_login_existing_courier(self, register):
-        login, password = register
+        login, password, _ = register
 
         auth_response = requests.post(f"{BASE_URL}/courier/login", json={"login": login, "password": password})
         assert auth_response.status_code == 200
@@ -26,24 +26,33 @@ class TestLoginCourier:
                                       json={"login": fake_login, "password": fake_password})
 
         assert auth_response.status_code == 404
+        response_data = auth_response.json()
+        expected_message = "Учетная запись не найдена"
+        assert response_data["message"] == expected_message
 
     @allure.title('Тест логина без логина')
     @allure.description('Проверяется, что если не указан логин, возвращается ошибка 400.')
     @allure.step('Попытка логина без логина')
     def test_login_without_login(self, register):
-        _, password= register
+        _, password, _ = register
 
 
         auth_response = requests.post(f"{BASE_URL}/courier/login", json={"password": password})
 
         assert auth_response.status_code == 400
+        response_data = auth_response.json()
+        expected_message = "Недостаточно данных для входа"
+        assert response_data["message"] == expected_message
 
     @allure.title('Тест логина без пароля')
     @allure.description('Проверяется, что если не указан пароль, возвращается ошибка 400.')
     @allure.step('Попытка логина без пароля')
     def test_login_without_password(self, register):
-        login, _= register
+        login, _, _ = register
 
         auth_response = requests.post(f"{BASE_URL}/courier/login", json={"login": login})
 
         assert auth_response.status_code == 400
+        response_data = auth_response.json()
+        expected_message = "Недостаточно данных для входа"
+        assert response_data["message"] == expected_message

@@ -8,13 +8,13 @@ class TestCreateCourier:
     @allure.step('Создание курьера с полными данными')
     def test_create_courier_with_full_data(self, register):
         assert len(register) == 3
-
         response = requests.post(f"{BASE_URL}/courier", json={
             "login": register[0],
             "password": register[1],
             "firstName": register[2]
         })
         assert response.status_code == 201
+
         assert response.json() == {"ok": True}
 
     @allure.title('Тест создания курьера без логина')
@@ -30,7 +30,10 @@ class TestCreateCourier:
         response = requests.post(f"{BASE_URL}/courier", json=payload)
 
         assert response.status_code == 400
-        assert response.json() == {"message": "Недостаточно данных для создания учетной записи"}
+        response_data = response.json()
+        expected_message = "Недостаточно данных для создания учетной записи"
+        assert response_data["message"] == expected_message
+
 
     @allure.title('Тест создания курьера без пароля')
     @allure.description('Проверяется создание курьера без пароля, ожидается ошибка 400.')
@@ -45,7 +48,10 @@ class TestCreateCourier:
         response = requests.post(f"{BASE_URL}/courier", json=payload)
 
         assert response.status_code == 400
-        assert response.json() == {"message": "Недостаточно данных для создания учетной записи"}
+        response_data = response.json()
+        expected_message = "Недостаточно данных для создания учетной записи"
+        assert response_data["message"] == expected_message
+
 
     @allure.title('Тест дублирования курьера')
     @allure.description('Проверяется попытка создания курьера с уже существующим логином. Ожидается ошибка 409.')
@@ -65,4 +71,6 @@ class TestCreateCourier:
 
         duplicate_response = requests.post(f"{BASE_URL}/courier", json=payload)
         assert duplicate_response.status_code == 409
-        assert duplicate_response.json() == {"message": "Этот логин уже используется"}
+        response_data = duplicate_response.json()
+        expected_message = "Этот логин уже используется"
+        assert response_data["message"] == expected_message
